@@ -19,6 +19,11 @@ import { FRONTEND_ADDONS, BACKEND_ADDONS } from "./addons/config.js";
 import { getFrontendAddonsChoices, getBackendAddonsChoices } from "./addons/choices.js";
 import { installAddons } from "./addons/install.js";
 
+// Imports des commandes
+import { doctorCommand } from "./commands/doctor.js";
+import { dockerDevCommand, dockerStopCommand, dockerLogsCommand } from "./commands/docker.js";
+import { makeModuleCommand } from "./commands/make-module.js";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PACKAGE_NAME = "dualsync";
 const CURRENT_VERSION = "1.2.2";
@@ -306,6 +311,46 @@ program
       spinner.fail("Erreur lors de la création du projet.");
       console.error(error);
     }
+  });
+
+// Commande doctor
+program
+  .command("doctor")
+  .description("Vérifier si les outils nécessaires sont installés")
+  .action(async () => {
+    await doctorCommand();
+  });
+
+// Commande docker:dev
+program
+  .command("docker:dev")
+  .description("Lancer l'environnement Docker de développement")
+  .action(async () => {
+    await dockerDevCommand();
+  });
+
+// Commande docker:stop
+program
+  .command("docker:stop")
+  .description("Arrêter les conteneurs Docker")
+  .action(async () => {
+    await dockerStopCommand();
+  });
+
+// Commande docker:logs
+program
+  .command("docker:logs")
+  .description("Afficher les logs des conteneurs Docker")
+  .action(async () => {
+    await dockerLogsCommand();
+  });
+
+// Commande make:module
+program
+  .command("make:module <name>")
+  .description("Générer un module backend (controller, service, routes)")
+  .action(async (name: string) => {
+    await makeModuleCommand(name);
   });
 
 program.parse(process.argv);
