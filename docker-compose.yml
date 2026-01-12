@@ -1,0 +1,18 @@
+services:
+  pwd-BDD:
+    image: postgres:17-alpine
+
+    environment:
+      POSTGRES_DB: bdd-Mdp
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: Banane24750
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    volumes:
+      - pwd-bdd-data:/var/lib/postgresql/data/pgdata
+
+    ports:
+      - "54321:5432"
+
+volumes:
+  pwd-bdd-data:
