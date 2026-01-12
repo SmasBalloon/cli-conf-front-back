@@ -26,13 +26,13 @@ bun install
 ## 🚀 Utilisation
 
 ```bash
-node index.ts new <nom-du-projet>
+smash new <nom-du-projet>
 ```
 
 ### Exemple
 
 ```bash
-node index.ts new mon-app
+smash new mon-app
 ```
 
 La CLI te guidera à travers les choix :
@@ -128,7 +128,7 @@ npm run dev        # Démarre sur http://localhost:3000
 
 ### Backend (avec Prisma)
 - `npm run dev` - Mode développement
-- `npm run build` - Build production
+- `npm run build` - Build production (si disponible)
 - `npm run db:generate` - Générer client Prisma
 - `npm run db:push` - Pousser schéma vers DB
 - `npm run db:migrate` - Créer migration
