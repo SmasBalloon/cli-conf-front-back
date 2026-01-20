@@ -52,9 +52,7 @@ function generateDockerComposeYaml(database: string, config: DbConfig): string {
         .join("\n");
 
     if (database === "PostgreSQL") {
-        return `'
-
-services:
+        return `services:
   postgres:
     image: ${config.image}
     container_name: ${database.toLowerCase()}_container
@@ -75,9 +73,7 @@ volumes:
   postgres_data:
 `;
     } else if (database === "MariaDB") {
-        return `'
-
-services:
+        return `services:
   mariadb:
     image: ${config.image}
     container_name: ${database.toLowerCase()}_container

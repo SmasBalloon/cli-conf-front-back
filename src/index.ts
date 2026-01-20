@@ -19,6 +19,7 @@ import { generateDockerCompose } from "./docker/compose.js";
 // Import du système de templates
 import { fetchTemplate } from "./templates/download.js";
 import { PRESET_INFO, Preset } from "./templates/config.js";
+import { createEcosystemConfig, createLogsDirectory } from "./templates/pm2.js";
 
 // Imports des commandes
 import { doctorCommand } from "./commands/doctor.js";
@@ -27,7 +28,7 @@ import { makeModuleCommand } from "./commands/make-module.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PACKAGE_NAME = "dualsync";
-const CURRENT_VERSION = "1.3.0";
+const CURRENT_VERSION = "2.1.1";
 
 // Logo ASCII art
 const LOGO = `
@@ -178,6 +179,12 @@ program
         ],
         initial: 0,
       },
+      {
+        type: "confirm",
+        name: "usePM2",
+        message: "Veux-tu utiliser PM2 (process manager) pour gérer ton backend ?",
+        initial: true,
+      },
     ]);
 
     // Vérifier si l'utilisateur a annulé
@@ -206,6 +213,12 @@ program
       // 4. Générer docker-compose.yml si une BD est sélectionnée
       if (answers.database !== "Aucune") {
         generateDockerCompose(name, answers.database);
+      }
+
+      // 4.5. Générer ecosystem.config.js pour PM2 si demandé
+      if (answers.usePM2) {
+        createEcosystemConfig(name, name, answers.backend, answers.packageManager);
+        createLogsDirectory(name);
       }
 
       // 5. Créer un fichier .gitignore pour le projet
@@ -259,6 +272,7 @@ program
       console.log(` Backend: ${pc.cyan(answers.backend)} ${pc.dim(`(${PRESET_INFO[backendPreset].name})`)}`);
       console.log(` Database: ${pc.cyan(answers.database)}`);
       console.log(` Package Manager: ${pc.cyan(answers.packageManager)}`);
+      console.log(` PM2: ${answers.usePM2 ? pc.green("✅ Activé") : pc.dim("Désactivé")}`);
 
       // Afficher info sur les fichiers .env générés
       console.log(`\n${pc.green("🔐 Fichiers .env générés:")}`);
@@ -266,6 +280,16 @@ program
       console.log(` ${pc.dim("• " + name + "/frontend/.env")} ${pc.cyan("(configuration API)")}`);
       console.log(` ${pc.dim("• Les fichiers .env.example sont également créés pour le partage")}`);
 
+      // Afficher info sur PM2 si activé
+      if (answers.usePM2) {
+        console.log(`\n${pc.green("⚙️ PM2 Ecosystem Config:")}`);
+        console.log(` ${pc.dim("• " + name + "/ecosystem.config.js")} ${pc.cyan("(configuration PM2 créée)")}`);
+        console.log(` ${pc.dim("• " + name + "/logs/")} ${pc.cyan("(dossier de logs créé)")}`);
+        console.log(`\n${pc.dim("Commandes PM2 utiles:")}` );
+        console.log(` ${pc.cyan("pm2 start ecosystem.config.js")} ${pc.dim("(démarrer l'appli")}`);
+        console.log(` ${pc.cyan("pm2 logs")} ${pc.dim("(voir les logs)")}`);
+        console.log(` ${pc.cyan("pm2 monit")} ${pc.dim("(monitorer les ressources)")}`);
+      }
       if (answers.database !== "Aucune") {
         console.log(`\n${pc.yellow("📦 Docker Compose détecté:")}`);
         console.log(` ${pc.dim("cd " + name + " && docker-compose up -d")}\n`);

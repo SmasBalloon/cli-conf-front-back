@@ -116,10 +116,10 @@ export function getTemplateTarballUrl(
     type: "frontend" | "backend",
     template: string,
     preset: Preset,
-    branch: string = "main"
+    branch: string = "master"
 ): string {
     const repo = getTemplateRepo(type, template, preset);
-    return `https://github.com/${repo}/archive/refs/heads/${branch}.tar.gz`;
+    return `https://codeload.github.com/${repo}/tar.gz/${branch}`;
 }
 
 // Liste tous les templates disponibles

@@ -14,7 +14,10 @@ async function downloadFile(url: string, destPath: string): Promise<void> {
         const request = (currentUrl: string) => {
             https.get(currentUrl, (response) => {
                 // Suivre les redirections
-                if (response.statusCode === 301 || response.statusCode === 302) {
+                if (response.statusCode === 301 || response.statusCode === 302 || response.statusCode === 303 || response.statusCode === 307 || response.statusCode === 308) {
+                    // Consommer la réponse pour libérer les ressources
+                    response.resume();
+                    
                     const redirectUrl = response.headers.location;
                     if (redirectUrl) {
                         request(redirectUrl);
@@ -23,6 +26,7 @@ async function downloadFile(url: string, destPath: string): Promise<void> {
                 }
 
                 if (response.statusCode !== 200) {
+                    response.resume(); // Consommer la réponse
                     reject(new Error(`Failed to download: ${response.statusCode}`));
                     return;
                 }
@@ -57,7 +61,7 @@ export async function downloadTemplate(
     template: string,
     preset: Preset,
     destPath: string,
-    branch: string = "main"
+    branch: string = "master"
 ): Promise<void> {
     const repo = getTemplateRepo(type, template, preset);
 
@@ -106,7 +110,7 @@ export async function cloneTemplate(
     template: string,
     preset: Preset,
     destPath: string,
-    branch: string = "main"
+    branch: string = "master"
 ): Promise<void> {
     const repo = getTemplateRepo(type, template, preset);
     const repoUrl = `https://github.com/${repo}.git`;
